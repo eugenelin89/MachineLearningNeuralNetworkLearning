@@ -85,8 +85,20 @@ for i=1 : m % for each training example
    J = J + sum(-1*y_i .* log(h_i) .- (1.-y_i).*log(1 .- h_i ));
 
 end;
+% Non-regularized cost computed:
 J = J / m;
 
+% Now, compute the regularized term
+% Layer 1
+Theta1_r = Theta1;
+Theta1_r(:,1) = [];
+layer1_r = sum(sum(Theta1_r .^2));
+
+Theta2_r = Theta2;
+Theta2_r(:,1) = [];
+layer2_r = sum(sum(Theta2_r .^2));
+
+J = J + lambda/(2 * m)*(layer1_r + layer2_r);
 
 
 
