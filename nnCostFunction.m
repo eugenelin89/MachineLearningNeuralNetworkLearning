@@ -126,8 +126,15 @@ for t=1 : m
    DELTA_1 = DELTA_1 + d2(2:end) * a1'; 
 end;
 
-Theta1_grad = DELTA_1 / m;
-Theta2_grad = DELTA_2 / m;
+% Regularization
+% First column corresponds to j=0
+reg1 = lambda/m * Theta1_r;
+reg1 = [zeros(size(reg1,1),1) reg1]; 
+reg2 = lambda/m * Theta2_r;
+reg2 = [zeros(size(reg2,1),1) reg2];
+
+Theta1_grad = DELTA_1 / m + reg1;
+Theta2_grad = DELTA_2 / m + reg2;
 
 
 
