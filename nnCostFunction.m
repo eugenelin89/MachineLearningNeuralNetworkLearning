@@ -61,7 +61,7 @@ Theta2_grad = zeros(size(Theta2));
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
 %
-
+warning("off");
 X = [ones(m, 1) X]; % adding the bias unit for all training set examples.
 Z2 = Theta1 * X'; % Z2 is a matrix of 25x5000. Each vertical column is z2 for a single training example.  (Each horizontal row is z2 of an activation unit across the training set)
 A2 = sigmoid(Z2); % A2 is a matrix of 25x5000. Each vertical column is the 25 activation unit in hidden layer 1 for a single training exaple.
@@ -72,7 +72,7 @@ Z3 = Theta2 * A2'; % Z3 is a matrix of 10x5000. Each vertical column is z3 for a
 A3 = sigmoid(Z3); % A3 is output matrix of 10x5000.  Each vertical column is output vector for each training example.
 H = A3'; % H is 5000x10 where each row is the output vector for a single traning example, corresponds to input X.
 
-% now, y is a mx1 vectors each contain the training result in the set [0,1,2,...,num_labels].  
+% now, y is a 5000x1 vectors each contain the training result in the set [0,1,2,...,num_labels].  
 % We want to re-code y so that each element of y is a vector of size num_labels with the approprisate index set to 1
 Y = ([1:1:num_labels] == y); % Y is 5000x10 where each row is the re-coded y of a single traing example. 
 
@@ -100,8 +100,31 @@ layer2_r = sum(sum(Theta2_r .^2));
 
 J = J + lambda/(2 * m)*(layer1_r + layer2_r);
 
+% Back Propagation
+
+% compute d3 (delta for layer 3) and d2 (delta for layer 2)
+Z2_with_bias = [100*ones(1,m);Z2]; %26x5000
+DELTA_2 = zeros(size(Theta2));
+DELTA_1 = zeros(size(Theta1));
+for t=1 : m
+   % compute d3:
+   h_t = A3(:,t); % prediction for t_th training example.  Note this is a column vector.
 
 
+ 
+   y_t = Y'(:,1); % training value for t_th training example.  Note this is a column vector.
+   d3 = h_t - y_t; % third layer (output) delta, a column vector 10x1. 
+   % compute d2:
+   d2 = Theta2' * d3 .* sigmoidGradient(Z2_with_bias(:,t)); % 26x1
+
+   a2_t = A2(t,:); % A2 is already transposed above, we take t_th row. 1x26
+   DELTA_2 = DELTA_2 + d3 * a2_t;
+   a1_t = X(t,:);
+   DELTA_1 = DELTA_1 + d2(2:end) * a1_t; 
+end;
+
+Theta1_grad = DELTA_1 / m;
+Theta2_grad = DELTA_2 / m;
 
 
 
