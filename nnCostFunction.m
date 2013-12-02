@@ -107,20 +107,23 @@ Z2_with_bias = [100*ones(1,m);Z2]; %26x5000
 DELTA_2 = zeros(size(Theta2));
 DELTA_1 = zeros(size(Theta1));
 for t=1 : m
-   % compute d3:
-   h_t = A3(:,t); % prediction for t_th training example.  Note this is a column vector.
 
+   % get input of training example t
+   a1 = X(t,:)'; %401x1
+   z2 = Theta1 * a1;
+   a2 = sigmoid(z2);
+   a2 = [1;a2]; % add bias unit
+   z3 = Theta2 * a2;
+   a3 = sigmoid(z3); % output vector
 
- 
-   y_t = Y'(:,1); % training value for t_th training example.  Note this is a column vector.
-   d3 = h_t - y_t; % third layer (output) delta, a column vector 10x1. 
+   % compute d3: 
+   y_t = Y'(:,t); % training value for t_th training example.  Note this is a column vector.
+   d3 = a3 - y_t; % third layer (output) delta, a column vector 10x1. 
    % compute d2:
-   d2 = Theta2' * d3 .* sigmoidGradient(Z2_with_bias(:,t)); % 26x1
+   d2 = Theta2' * d3 .* sigmoidGradient([100;z2]); % 26x1
 
-   a2_t = A2(t,:); % A2 is already transposed above, we take t_th row. 1x26
-   DELTA_2 = DELTA_2 + d3 * a2_t;
-   a1_t = X(t,:);
-   DELTA_1 = DELTA_1 + d2(2:end) * a1_t; 
+   DELTA_2 = DELTA_2 + d3 * a2';
+   DELTA_1 = DELTA_1 + d2(2:end) * a1'; 
 end;
 
 Theta1_grad = DELTA_1 / m;
