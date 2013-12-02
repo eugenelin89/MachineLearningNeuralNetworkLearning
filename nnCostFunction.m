@@ -62,9 +62,30 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+X = [ones(m, 1) X]; % adding the bias unit for all training set examples.
+Z2 = Theta1 * X'; % Z2 is a matrix of 25x5000. Each vertical column is z2 for a single training example.  (Each horizontal row is z2 of an activation unit across the training set)
+A2 = sigmoid(Z2); % A2 is a matrix of 25x5000. Each vertical column is the 25 activation unit in hidden layer 1 for a single training exaple.
+A2 = A2'; % now this is the input into layer 3, 5000x25. Just like how X was input to layer 2.  Each row is a single traning example. (We don't really need this step except for clarity)
+
+A2 = [ones(m, 1) A2]; % adding the bias unit for all training set examples. 5000x26.
+Z3 = Theta2 * A2'; % Z3 is a matrix of 10x5000. Each vertical column is z3 for a single training example.
+A3 = sigmoid(Z3); % A3 is output matrix of 10x5000.  Each vertical column is output vector for each training example.
+H = A3'; % H is 5000x10 where each row is the output vector for a single traning example, corresponds to input X.
+
+% now, y is a mx1 vectors each contain the training result in the set [0,1,2,...,num_labels].  
+% We want to re-code y so that each element of y is a vector of size num_labels with the approprisate index set to 1
+Y = ([1:1:num_labels] == y); % Y is 5000x10 where each row is the re-coded y of a single traing example. 
 
 
 
+for i=1 : m % for each training example
+   h_i = H(i,:); % prediction for i_th training example 
+   y_i = Y(i,:); % training value for i_th training example
+
+   J = J + sum(-1*y_i .* log(h_i) .- (1.-y_i).*log(1 .- h_i ));
+
+end;
+J = J / m;
 
 
 
